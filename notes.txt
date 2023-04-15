@@ -1,0 +1,15 @@
+Resistor: reduces the amount of current flowing in the circuit
+i = V/R
+i = ampers
+V = volts
+R = ohms
+
+LED: long prong (+ cathode); short prong (- anode)
+- RED LED needs 220ohm
+
+DIP Switch: 3 independent switches in one component
+- When a switch is active it connects the pins
+- 5v connected to one pin A of the switch
+- input pin connected to pin B of the switch
+- 220ohm resistor connected to pin B and GRD
+The resistor is needed to help defining the voltage provided to the input pin. Without the resistor, we would get a short circuit.
