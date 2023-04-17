@@ -11,5 +11,24 @@ DIP Switch: 3 independent switches in one component
 - When a switch is active it connects the pins
 - 5v connected to one pin A of the switch
 - input pin connected to pin B of the switch
-- 220ohm resistor connected to pin B and GRD
-The resistor is needed to help defining the voltage provided to the input pin. Without the resistor, we would get a short circuit.
+- 220ohm resistor connected to pin B and GRD. The resistor is needed to help defining the voltage provided to the input pin. Without the resistor, we would get a short circuit.
+With the resistor: i = 5v/220ohm = 0.02amps
+Without the resistor: i = 5v/~0ohm = short circuit
+
+Photoresistor: more light equals lower resistance; less light equals higher resistance
+- Use 5v in one of the photoresistor's pins
+- Use analog input for the photoresistor followed by a 220ohm resistor into GRD
+
+
+// Hello world
+// bits/seconds (= baoud)
+void setup() {
+  Serial.begin(9600);
+}
+
+void loop() {
+  Serial.println("Hello");
+  delay(500);
+  Serial.println("Goodbye");
+  delay(500);
+}
