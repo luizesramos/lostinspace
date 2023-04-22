@@ -1,27 +1,54 @@
-Resistor: reduces the amount of current flowing in the circuit
+== Resistor: reduces the amount of current flowing in the circuit
 i = V/R
-i = ampers
+i = amperes
 V = volts
 R = ohms
 
-LED: long prong (+ cathode); short prong (- anode)
+To read R with a multimeter (1) put black on COM port; (2) put red on OHM symbol port; (3) set dial to lowest resistance;
+(4) measure both ends of the resistor when NOT connected to the circuit. If 1 shows, move to the next order of magnitude
+ for the resistance.
+
+== LED: long prong (+ cathode); short prong (- anode)
 - RED LED needs 220ohm
 
-DIP Switch: 3 independent switches in one component
+== DIP Switch: 3 independent switches in one component
 - When a switch is active it connects the pins
 - 5v connected to one pin A of the switch
 - input pin connected to pin B of the switch
-- 220ohm resistor connected to pin B and GRD. The resistor is needed to help defining the voltage provided to the input pin. Without the resistor, we would get a short circuit.
+- 220ohm resistor connected to pin B and GRND. The resistor is needed to help defining the voltage provided to the input pin. Without the resistor, we would get a short circuit.
 With the resistor: i = 5v/220ohm = 0.02amps
 Without the resistor: i = 5v/~0ohm = short circuit
 
-Photoresistor: more light equals lower resistance; less light equals higher resistance
+== Photoresistor: more light equals lower resistance; less light equals higher resistance
 - Use 5v in one of the photoresistor's pins
-- Use analog input for the photoresistor followed by a 220ohm resistor into GRD
+- Use ANALOG input for the photoresistor followed by a 220ohm resistor into GRND
+- Note: analog pins are always input
+- Note: analog pins read values between 0 and 1024
 
+== RGB LED: four leads, longest lead is GRND (common lead); each color lead needs a resistor
+--- R
+----- GRND
+---- G
+--- B
+- We can use discrete values for RGB (2^3 pins = 8 combinations)
+  > use digitalWrite(PIN, ValueHighOrLow)
+
+- We can also use PWM (pulse width modulation) 
+  255: on all the time; 
+  128: on 50% of time; 
+  0: off all the time.
+  The number of colors goes to 256^3 = (2^8)^3 = 2^24 combinations
+  > use analogWrite(PIN, Value0to255) for PWM in pins that support it
+
+- Note: we can also use 5v in the common lead, but 
+> the colors will be active on LOW and inactive on HIGH (for digitalWrite)
+> the PWM values will be 255 minus RGB component (for analogWrite)
+
+
+== Serial writes
 
 // Hello world
-// bits/seconds (= baoud)
+// bits/seconds (= baud)
 void setup() {
   Serial.begin(9600);
 }
