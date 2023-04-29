@@ -51,7 +51,8 @@ Without the resistor: i = 5v/~0ohm = short circuit
 > DIO: outputs one byte per CLK cycle
 > CLK: clocks binary data from the DIO pin
 
-- Segments map to a byte: most significant bit [DP|G|F|E|D|C|B|A] least significant bit
+- Segments map to a byte: [DP|G|F|E|D|C|B|A]
+
   A
 F   B
   G
