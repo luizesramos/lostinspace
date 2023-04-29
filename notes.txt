@@ -15,19 +15,19 @@ To read R with a multimeter (1) put black on COM port; (2) put red on OHM symbol
 - When a switch is active it connects the pins
 - 5v connected to one pin A of the switch
 - input pin connected to pin B of the switch
-- 220ohm resistor connected to pin B and GRND. The resistor is needed to help defining the voltage provided to the input pin. Without the resistor, we would get a short circuit.
+- 220ohm resistor connected to pin B and GND. The resistor is needed to help defining the voltage provided to the input pin. Without the resistor, we would get a short circuit.
 With the resistor: i = 5v/220ohm = 0.02amps
 Without the resistor: i = 5v/~0ohm = short circuit
 
 == Photoresistor: more light equals lower resistance; less light equals higher resistance
 - Use 5v in one of the photoresistor's pins
-- Use ANALOG input for the photoresistor followed by a 220ohm resistor into GRND
+- Use ANALOG input for the photoresistor followed by a 220ohm resistor into GND
 - Note: analog pins are always input
 - Note: analog pins read values between 0 and 1024
 
-== RGB LED: four leads, longest lead is GRND (common lead); each color lead needs a resistor
+== RGB LED: four leads, longest lead is GND (common lead); each color lead needs a resistor
 --- R
------ GRND
+----- GND
 ---- G
 --- B
 - We can use discrete values for RGB (2^3 pins = 8 combinations)
@@ -44,6 +44,28 @@ Without the resistor: i = 5v/~0ohm = short circuit
 > the colors will be active on LOW and inactive on HIGH (for digitalWrite)
 > the PWM values will be 255 minus RGB component (for analogWrite)
 
+== 7-segment display
+- Pins:
+> GND
+> VCC (voltage common collector) = 5v
+> DIO: outputs one byte per CLK cycle
+> CLK: clocks binary data from the DIO pin
+
+- Segments map to a byte: most significant bit [DP|G|F|E|D|C|B|A] least significant bit
+  A
+F   B
+  G
+E   C
+  D   DP
+
+#define SEG_A   0b00000001
+#define SEG_B   0b00000010
+#define SEG_C   0b00000100
+#define SEG_D   0b00001000
+#define SEG_E   0b00010000
+#define SEG_F   0b00100000
+#define SEG_G   0b01000000
+#define SEG_DP  0b10000000
 
 == Serial writes
 
