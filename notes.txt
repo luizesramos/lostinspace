@@ -68,6 +68,22 @@ E   C
 #define SEG_G   0b01000000
 #define SEG_DP  0b10000000
 
+== Rotary encoders
+
+Absolute encoders: map a code to a rotation angle of the toggle. Absolute encoders have a max and a min rotation value.
+Relative encoders: the encoded value is relative to an original position without a max or min.
+
+The relative encoder we use has 30 positions = 18degrees between positions.
+Pinout:
+- CLK: when we rotate the encoder, CLK transitions to HIGH while we are turning it, and transitions to LOW when it clicks in place.
+- DT: signal is staggered with CLK to provide info about the rotation direction
+If CLK goes HIGH before DT goes HIGH, we are rotating clockwise
+If CLK goes HIGH after DT goes HIGH, we are rotating counter-clockwise
+
+- SW: reads the push button on the encoder (if we push down on it, it captures a button click)
+- VCC(labeled "+"): power supply
+- GND: ground
+
 == Serial writes
 
 // Hello world
@@ -82,3 +98,10 @@ void loop() {
   Serial.println("Goodbye");
   delay(500);
 }
+
+== Interrupts
+
+// calls myInterruptHandler when the value of an input pin (MY_PIN) changes
+attachInterrupt(digitalPinToInterrupt(MY_PIN), myInterruptHandler, CHANGE);
+
+myInterruptHandler is a void method where we read the pin values of interest and perform our update tasks based on the pin states.
