@@ -32,129 +32,118 @@ Clock clk;
 // data
 const uint8_t data[] = { 0xff, 0xff, 0xff, 0xff };
 const uint8_t full[] = { 0b01110001, 0b00111110, 0b00111000, 0b00111000 };
-String rotationDirection;
 
 // shortcut
-bool shortcutModeEnabled = false;
-int buffer[] = { SECRET1, SECRET2, SECRET3 };
+bool shortcutMode = false;
+int buffer[] = { 666, SECRET1, SECRET2, SECRET3 };
+int n = sizeof(buffer) / sizeof(int);
 int bufferIndex = 0;
-unsigned long lastButtonPressMillis = 0;
-int lastButtonState;
+int lastCounter;
 
 void setup() {
-  pinMode(ENCODER_CLK, INPUT);
-  pinMode(ENCODER_DT, INPUT);
-  pinMode(ENCODER_SW, INPUT);
-  clk.lastState = digitalRead(ENCODER_CLK);
-  lastButtonState = digitalRead(ENCODER_SW);
-
   Serial.begin(9600);
   display.clear();
   delay(1000);
   display.setBrightness(2);
 
+  setupRotaryEncoder();
+}
+
+// Rotary encoder with button
+
+void setupRotaryEncoder() {
+  pinMode(ENCODER_CLK, INPUT);
+  pinMode(ENCODER_DT, INPUT);
+  pinMode(ENCODER_SW, INPUT);
+  clk.lastState = digitalRead(ENCODER_CLK);
+  digitalWrite(ENCODER_SW, HIGH);  // remove noise from the button pin
   attachInterrupt(digitalPinToInterrupt(ENCODER_CLK), updateEncoder, CHANGE);
-  attachInterrupt(digitalPinToInterrupt(ENCODER_DT), updateEncoder, CHANGE);
 }
 
 void updateEncoder() {
   clk.currentState = digitalRead(ENCODER_CLK);
-  int dtPin = digitalRead(ENCODER_DT);
 
-  // detect transition from LOW to HIGH
-  if (clk.currentState == HIGH && clk.currentState != clk.lastState) {
-    // detect clockwise rotation
-    if (dtPin != clk.currentState) {
-      counter++;
-      rotationDirection = "CW";
-
-      // counter-clockwise rotation
+  // detect transition from LOW to HIGH or from HIGH to LOW
+  if ((clk.currentState == HIGH && clk.currentState != clk.lastState) || (clk.currentState == LOW && clk.currentState != clk.lastState)) {
+    if (digitalRead(ENCODER_DT) != clk.currentState) {
+      onClockwiseRotation();
     } else {
-      counter--;
-      rotationDirection = "CCW";
+      onCounterClockwiseRotation();
     }
-
-    Serial.print("Direction: ");
-    Serial.print(rotationDirection);
-    Serial.print(" Counter: ");
-    Serial.println(counter);
-  } else if (clk.currentState == LOW && clk.currentState != clk.lastState) {
-    // Serial.print("HIGH -> LOW CLK: DT ");
-    // Serial.println(dtPin);
-
-    if (dtPin == clk.currentState) {
-      counter--;
-      rotationDirection = "CCW";
-    } else {
-      counter++;
-      rotationDirection = "CW";
-    }
-
-    Serial.print("Direction: ");
-    Serial.print(rotationDirection);
-    Serial.print(" Counter: ");
-    Serial.println(counter);
   }
 
   clk.lastState = clk.currentState;
 }
 
-bool buttonEventHappening = false;
+void onClockwiseRotation() {
+  if (shortcutMode) {
+    bufferIndex = (bufferIndex + 1) % n;
+    counter = buffer[bufferIndex];
+
+    Serial.print("BUFFER ");
+    Serial.println(bufferIndex);
+  } else {
+    counter++;
+  }
+}
+
+void onCounterClockwiseRotation() {
+  if (shortcutMode) {
+    if (bufferIndex > 0) {
+      bufferIndex = (bufferIndex - 1);
+    } else {
+      bufferIndex = n - 1;
+    }
+    counter = buffer[bufferIndex];
+    Serial.print("BUFFER ");
+    Serial.println(bufferIndex);
+
+  } else {
+    counter--;
+  }
+}
+
+bool buttonPress() {
+  if (digitalRead(ENCODER_SW) == LOW) {
+    delay(20);  // debounce time ms
+    unsigned long t1 = millis();
+    while (digitalRead(ENCODER_SW) == LOW) {}
+    unsigned long diff = millis() - t1;
+
+    if (diff > 50) {
+      //Serial.println("Key Press");
+      return true;
+    }
+  }
+  return false;
+}
 
 void loop() {
-  // int button = digitalRead(ENCODER_SW);
-  // if (button == LOW) {
-  //   if (!buttonEventHappening && millis() - lastButtonPressMillis > 70) {
-  //     buttonEventHappening = true;
-  //     Serial.println(button);
-  //   }
-  // } else {
-  //   buttonEventHappening = false;
-  //   lastButtonPressMillis = millis();
-  // }
-  // lastButtonState = button;
+  display.showNumberDec(counter);
 
+  if (buttonPress()) {
+    shortcutMode = !shortcutMode;
+    if (shortcutMode) {
+      lastCounter = counter;
+      bufferIndex = 0;
+      counter = buffer[bufferIndex];
+    } else {
+      counter = lastCounter;
+    }
+    Serial.print("SHORTCUT MODE ");
+    Serial.println(shortcutMode ? "ON" : "OFF");
+  }
 
-  // display.showNumberDec(counter);
-  // delay(50);
-
-  // if (shortcutModeEnabled) {
-  //   shortcutMode();
-  // }
-
-  // secureMode();
-}
-
-void shortcutMode() {
-}
-
-void secureMode() {
   if (counter == SECRET1 || counter == SECRET2 || counter == SECRET3) {
     playTone(counter);
-    delay(2000);
+    delay(1000);
     display.clear();
-
-    if (counter == SECRET3) {
-      showFull();
-    }
-
-    counter++;  // so we don't keep playing the tone again
   }
 }
 
 void playTone(int toneFrequency) {
   // note: no need to set the buzzer pin as output. tone must do it internally.
-  tone(buzzerPin, toneFrequency, 1000);  // play tone for 1 second
-  delay(1000);
+  tone(buzzerPin, toneFrequency, 500);  // play tone for 1 second
+  delay(500);
   noTone(buzzerPin);
-}
-
-void showFull() {
-  display.setSegments(full);
-  delay(3000);
-  display.clear();
-  delay(1000);
-  display.setSegments(full);
-  delay(3000);
-  display.clear();
 }
