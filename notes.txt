@@ -101,6 +101,8 @@ void loop() {
 
 == Interrupts
 
+Arduino Uno supports interrupts only in pins 2 and 3 (via `digitalPinToInterrupt`).
+
 // calls myInterruptHandler when the value of an input pin (MY_PIN) changes
 attachInterrupt(digitalPinToInterrupt(MY_PIN), myInterruptHandler, CHANGE);
 
