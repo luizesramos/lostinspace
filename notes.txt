@@ -68,6 +68,18 @@ E   C
 #define SEG_G   0b01000000
 #define SEG_DP  0b10000000
 
+== OLED display
+- 128x64 display (U8glib.h)
+- Uses analog pins
+- uses I2C protocol (serial communication protocol) has a handshaking protocol to communicate data packets.
+
+Pinout
+- GND
+- VCC
+- SCK(analog): serial clock signal
+- SDA(analog): serial data pin
+
+
 == Rotary encoders
 
 Absolute encoders: map a code to a rotation angle of the toggle. Absolute encoders have a max and a min rotation value.
@@ -79,6 +91,8 @@ Pinout:
 - DT: signal is staggered with CLK to provide info about the rotation direction
 If CLK goes HIGH before DT goes HIGH, we are rotating clockwise
 If CLK goes HIGH after DT goes HIGH, we are rotating counter-clockwise
+
+Note: CLK and DT must be in interrupt-enabled pins (in Arduino Uno, pins 2 and 3 only)
 
 - SW: reads the push button on the encoder (if we push down on it, it captures a button click)
 - VCC(labeled "+"): power supply
